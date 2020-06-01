@@ -26,4 +26,20 @@ class Place {
     @required this.location,
     @required this.image,
   });
+
+  Place.fromMap(Map<String, dynamic> map)
+      : this(
+          id: map['id'],
+          title: map['title'],
+          image: File(map['image']),
+          location: null,
+        );
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'image': image.path,
+    };
+  }
 }

@@ -1,15 +1,33 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 class ImageInput extends StatefulWidget {
+  final Function onSelectImage;
+
+  ImageInput(this.onSelectImage);
+
   @override
   _ImageInputState createState() => _ImageInputState();
 }
 
 class _ImageInputState extends State<ImageInput> {
   File _storedImage;
+
+  Future<void> _takePicture() async {
+    final image = await ImagePicker.pickImage(source: ImageSource.camera);
+    setState(() {
+      _storedImage = image;
+    });
+    if (image == null) return;
+    final appDir = await path_provider.getApplicationDocumentsDirectory();
+    final imageName = path.basename(image.path);
+    final savedImage = await image.copy(path.join(appDir.path, imageName));
+    widget.onSelectImage(savedImage);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +52,7 @@ class _ImageInputState extends State<ImageInput> {
           alignment: Alignment.center,
         ),
         FlatButton.icon(
-          onPressed: () {},
+          onPressed: _takePicture,
           icon: Icon(Icons.camera),
           label: Text('Take Picture'),
           textColor: Theme.of(context).primaryColor,
